@@ -41,6 +41,7 @@ for i, peak in enumerate(peaks):
     debut_roi = max(left[i]-100, 0)  # Début de la ROI, 50 au lieu de 100 pour le co60 et 2e du na22, 30 pour le co57
     fin_roi = min(right[i]+100, max(x))  # Fin de la ROI
 
+
     # Région d'intérêt
     roi_x = x[debut_roi:fin_roi]
     roi_y = y[debut_roi:fin_roi]
