@@ -209,7 +209,7 @@ class Data_analysis:
 
 # application
 data_analysis = Data_analysis()
-folder_path = 'Donnees1/spec_ang/txt/'
+folder_path = 'Donnees1/mesures_init/txt/'
 file_directories = data_analysis.list_files_in_folder(folder_path)
 print(file_directories)
 
