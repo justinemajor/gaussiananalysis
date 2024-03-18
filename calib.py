@@ -2,11 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from scipy.signal import find_peaks
+from lab_analysis import Data_analysis
 
 # Supposons que vous ayez des valeurs connues et leurs indices correspondants
 # indices_connu = np.array([311.151, 1509.071, 1886.314, 2612.035, 2961.651])
-indices_connu = np.array([311.151, 1508.949, 1886.151, 2612.035, 2961.651])
-valeurs_calibrees = np.array([122, 662, 835, 1173, 1332])
+indices_connu = np.array([89.18195171624912, 225.22477063739933, 907.3673017230627, 332.80225678111793, 1630.5176612913885, 1276.4063097242545])
+valeurs_calibrees = np.array([31, 81, 356, 122, 662, 511])
 
 # Fonction pour ajuster les données connues
 def fonction_calibration(x, a, b):
@@ -31,15 +32,51 @@ plt.ylabel("Énergie équivalente [keV]")
 plt.legend()
 plt.show()
 
-y = []
-element = "na22"
-f = open(f"etalon_{element}.txt", "r")
-for i, line in enumerate(f):
-    if 12 <= i < 4108:
-        y.append(int(line))
-y = np.array(y)
-print(len(y))
-f.close()
+
+# application
+data_analysis = Data_analysis()
+folder_path = 'Donnees1/spec_ang/txt/'
+file_directories = data_analysis.list_files_in_folder(folder_path)
+print(file_directories)
+
+for file in file_directories:
+    print(file)
+    # Read raw data from a file
+    raw_data = data_analysis.read_raw_data(file)
+    # print(raw_data)
+
+    # Get measuring time for a specific file
+    measuring_time = data_analysis.get_measuring_time(file_directories[0])
+    print("temps d'acquisition : ", measuring_time)
+
+    # Find ROI limits
+    roi_limits = data_analysis.find_roi_limits(raw_data)
+    print("nombre de ROI : ", len(roi_limits[0]))
+
+    for ind, lower in enumerate(roi_limits[0]):
+        print("Indice de la ROI : ", ind)
+
+        try :
+            # Fit Gaussian to ROI
+            gaussian_params = data_analysis.fit_gaussian_to_roi(raw_data, lower, roi_limits[1,ind])
+            print("    ", gaussian_params)
+
+            # Plot spectrum with ROI(s) and fitted Gaussian curve
+            file = file.replace('.txt', '').replace('txt', 'fig')
+            data_analysis.plot_spectrum_with_roi([file, ind], raw_data, [lower,roi_limits[1,ind]], gaussian_params)
+
+            # Calculate total count within fitted Gaussian
+            total_count = data_analysis.calculate_total_count(raw_data, gaussian_params)
+            print("    nombre de comptes total : ", total_count)
+
+        except:
+            0
+
+
+
+
+
+
 
 x_ch = np.arange(len(y))
 # Calibration des indices des données

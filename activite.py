@@ -21,7 +21,7 @@ def activite_actuelle(date_initiale, radioactivite_initiale_uc, demi_vie, unite_
     date_initiale = datetime.datetime.strptime(date_initiale, '%Y-%m-%d')
 
     # Calculer le nombre de jours ou d'années écoulés depuis la date initiale jusqu'à la date actuelle
-    date_actuelle = datetime.datetime.strptime("2024-02-26", '%Y-%m-%d')
+    date_actuelle = datetime.datetime.strptime("2024-03-11", '%Y-%m-%d')
     duree_ecoulee = (date_actuelle - date_initiale).days if unite_demi_vie == 'jours' else (date_actuelle - date_initiale).days / 365.25
 
     # Calculer l'activité actuelle en microcuries
@@ -36,7 +36,7 @@ demi_vie = 30.08  # demi-vie en années ou jours
 unite_demi_vie = 'annees'  # 'jours' ou 'annees'
 
 activite = activite_actuelle(date_initiale, radioactivite_initiale_uc, demi_vie, unite_demi_vie)
-activite *= 10**-6*3.7*10**10*.5
+activite *= 10**-6*3.7*10**10*.5*0.8  # changer le facteur géométrique 0.5
 activite = int(activite)
 print(f"L'activité actuelle est de {activite} désintégrations par seconde.")
 
