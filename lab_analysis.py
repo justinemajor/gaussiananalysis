@@ -213,42 +213,44 @@ class Data_analysis:
         gaussian_curve = self.gaussian_function(x_data, gaussian_params['A'], gaussian_params['mu'], gaussian_params['sigma'], gaussian_params['a'], gaussian_params['b'])
         return int(np.sum(gaussian_curve))
 
-# application
-data_analysis = Data_analysis()
-folder_path = 'Donnees1/spec_diffuseurs/txt/'
 
-file_directories = data_analysis.list_files_in_folder(folder_path)
-print(file_directories)
 
-for file in file_directories:
-    print(file)
-    # Read raw data from a file
-    raw_data = data_analysis.read_raw_data(file)
-    # print(raw_data)
+if __name__ == "__main__":
+    data_analysis = Data_analysis()
+    folder_path = 'Donnees1/spec_diffuseurs/txt/'
 
-    # Get measuring time for a specific file
-    measuring_time = data_analysis.get_measuring_time(file)
-    print("temps d'acquisition : ", measuring_time)
+    file_directories = data_analysis.list_files_in_folder(folder_path)
+    print(file_directories)
 
-    # Find ROI limits
-    roi_limits = data_analysis.find_roi_limits(raw_data)
-    print("nombre de ROI : ", len(roi_limits[0]))
+    for file in file_directories:
+        print(file)
+        # Read raw data from a file
+        raw_data = data_analysis.read_raw_data(file)
+        # print(raw_data)
 
-    for ind, lower in enumerate(roi_limits[0]):
-        print("Indice de la ROI : ", ind)
+        # Get measuring time for a specific file
+        measuring_time = data_analysis.get_measuring_time(file)
+        print("temps d'acquisition : ", measuring_time)
 
-        try :
-            # Fit Gaussian to ROI
-            gaussian_params = data_analysis.fit_gaussian_to_roi(raw_data, lower, roi_limits[1,ind])
-            print("    ", gaussian_params)
+        # Find ROI limits
+        roi_limits = data_analysis.find_roi_limits(raw_data)
+        print("nombre de ROI : ", len(roi_limits[0]))
 
-            # Plot spectrum with ROI(s) and fitted Gaussian curve
-            file = file.replace('.txt', '').replace('txt', 'fig')
-            data_analysis.plot_spectrum_with_roi([file, ind], raw_data, [lower,roi_limits[1,ind]], gaussian_params)
+        for ind, lower in enumerate(roi_limits[0]):
+            print("Indice de la ROI : ", ind)
 
-            # Calculate total count within fitted Gaussian
-            total_count = data_analysis.calculate_total_count(raw_data, gaussian_params)
-            print("    nombre de comptes total : ", total_count)
+            try :
+                # Fit Gaussian to ROI
+                gaussian_params = data_analysis.fit_gaussian_to_roi(raw_data, lower, roi_limits[1,ind])
+                print("    ", gaussian_params)
 
-        except Exception as e:
-            0
+                # Plot spectrum with ROI(s) and fitted Gaussian curve
+                file = file.replace('.txt', '').replace('txt', 'fig')
+                data_analysis.plot_spectrum_with_roi([file, ind], raw_data, [lower,roi_limits[1,ind]], gaussian_params)
+
+                # Calculate total count within fitted Gaussian
+                total_count = data_analysis.calculate_total_count(raw_data, gaussian_params)
+                print("    nombre de comptes total : ", total_count)
+
+            except Exception as e:
+                0
