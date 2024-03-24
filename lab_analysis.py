@@ -23,7 +23,8 @@ class Data_analysis:
         file_directories = []
         for root, dirs, files in os.walk(folder_path):
             for file in files:
-                file_directories.append(os.path.join(root, file))
+                if not '.DS_Store' in file:
+                    file_directories.append(os.path.join(root, file))
         return file_directories
 
     import re
