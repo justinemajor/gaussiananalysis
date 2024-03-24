@@ -148,7 +148,7 @@ class Data_analysis:
         y_data = spectrum
 
         lower_limit = max(0, lower_limit-300)
-        upper_limit = min(len(y_data), upper_limit+300)
+        upper_limit = min(len(y_data), upper_limit+50)
 
         roi_x = x_data[lower_limit:upper_limit+1]
         roi_y = y_data[lower_limit:upper_limit+1]
@@ -198,7 +198,7 @@ class Data_analysis:
         plt.savefig(f"{file[0]}_{file[1]}.pdf", format="pdf", bbox_inches="tight")
         plt.show()
 
-    def calculate_total_count(self, spectrum, gaussian_params):
+    def calculate_total_count(self, spectrum, gaussian_params, upper_limit):
         """
         Calculate the total count number contained within reasonable limits of a fitted Gaussian.
 
@@ -209,15 +209,17 @@ class Data_analysis:
         Returns:
         float: Total count number.
         """
-        x_data = np.arange(len(spectrum))
+        x_data = np.arange(len(spectrum[:upper_limit]))
         gaussian_curve = self.gaussian_function(x_data, gaussian_params['A'], gaussian_params['mu'], gaussian_params['sigma'], gaussian_params['a'], gaussian_params['b'])
+        bruit = gaussian_params['a']*x_data+gaussian_params['b']
+        gaussian_curve -= bruit
         return int(np.sum(gaussian_curve))
 
 
 
 if __name__ == "__main__":
     data_analysis = Data_analysis()
-    folder_path = 'Donnees1/spec_diffuseurs/txt/'
+    folder_path = 'Donnees1/spec_ang/txt/'
 
     file_directories = data_analysis.list_files_in_folder(folder_path)
     print(file_directories)
@@ -249,7 +251,7 @@ if __name__ == "__main__":
                 data_analysis.plot_spectrum_with_roi([file, ind], raw_data, [lower,roi_limits[1,ind]], gaussian_params)
 
                 # Calculate total count within fitted Gaussian
-                total_count = data_analysis.calculate_total_count(raw_data, gaussian_params)
+                total_count = data_analysis.calculate_total_count(raw_data, gaussian_params, roi_limits[1,ind])
                 print("    nombre de comptes total : ", total_count)
 
             except Exception as e:

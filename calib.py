@@ -35,7 +35,7 @@ plt.show()
 
 # application
 data_analysis = Data_analysis()
-folder_path = 'Donnees1/spec_ang/txt/'
+folder_path = 'Donnees1/spec_diffuseurs/txt/'
 file_directories = data_analysis.list_files_in_folder(folder_path)
 
 for file in file_directories:
@@ -78,8 +78,8 @@ for file in file_directories:
             print('    FWHM : ', round(fwhm,3), round(fwhm_err,3))
 
             # Calculate total count within fitted Gaussian
-            total_count = data_analysis.calculate_total_count(raw_data, gaussian_params)
+            total_count = data_analysis.calculate_total_count(raw_data, gaussian_params, roi_limits[1,ind])
             print("    nombre de comptes normalisé : ", total_count/measuring_time)
 
-        except:
-            0
+        except Exception as e:
+            raise(e)
