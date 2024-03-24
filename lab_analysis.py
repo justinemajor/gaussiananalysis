@@ -94,7 +94,7 @@ class Data_analysis:
         tuple: Lower and upper limits of the ROI.
         """
 
-        threshold = np.mean(spectrum)*1.8  # or 1.5 for mesures_init and etalonnage
+        threshold = np.mean(spectrum)*2.1  # or 1.5 for mesures_init and etalonnage
         higher = np.where(spectrum > threshold)[0]
 
         #apply a Savitzky-Golay filter
@@ -116,7 +116,7 @@ class Data_analysis:
 
         return peaks_limits
 
-    def gaussian_function(self, x, A, mu, sigma):
+    def gaussian_function(self, x, A, mu, sigma, a, b):
         """
         Gaussian function.
 
@@ -129,7 +129,7 @@ class Data_analysis:
         Returns:
         numpy.ndarray: Gaussian curve.
         """
-        return A * np.exp(-(x - mu)**2 / (2 * sigma**2))
+        return A * np.exp(-(x - mu)**2 / (2 * sigma**2)) + a*x + b
 
     def fit_gaussian_to_roi(self, spectrum, lower_limit, upper_limit):
         """
@@ -146,6 +146,9 @@ class Data_analysis:
         x_data = np.arange(len(spectrum))
         y_data = spectrum
 
+        lower_limit = max(0, lower_limit-300)
+        upper_limit = min(len(y_data), upper_limit+300)
+
         roi_x = x_data[lower_limit:upper_limit+1]
         roi_y = y_data[lower_limit:upper_limit+1]
 
@@ -153,14 +156,16 @@ class Data_analysis:
         A_guess = np.max(roi_y)
         mu_guess = np.mean(roi_x)
         sigma_guess = np.std(roi_x)
+        a_guess = -0
+        b_guess = np.mean(roi_y[:300])
 
         # Perform curve fitting
-        popt, pcov = curve_fit(self.gaussian_function, roi_x, roi_y, p0=[A_guess, mu_guess, sigma_guess])
+        popt, pcov = curve_fit(self.gaussian_function, roi_x, roi_y, p0=[A_guess, mu_guess, sigma_guess, a_guess, b_guess])
 
         # Calculate errors
         perr = np.sqrt(np.diag(pcov))
 
-        return {'mu': popt[1], 'mu_error': perr[1], 'sigma': popt[2], 'sigma_error': perr[2], 'A':popt[0]}
+        return {'mu': popt[1], 'mu_error': perr[1], 'sigma': popt[2], 'sigma_error': perr[2], 'A':popt[0], 'a':popt[3], 'b':popt[4]}
 
     def plot_spectrum_with_roi(self, file, spectrum, roi_limits, gaussian_params=None):
         """
@@ -183,7 +188,7 @@ class Data_analysis:
 
         if gaussian_params:
             x_data = np.arange(len(spectrum))
-            gaussian_curve = self.gaussian_function(x_data, gaussian_params['A'], gaussian_params['mu'], gaussian_params['sigma'])
+            gaussian_curve = self.gaussian_function(x_data, gaussian_params['A'], gaussian_params['mu'], gaussian_params['sigma'], gaussian_params['a'], gaussian_params['b'])
             plt.plot(gaussian_curve, 'g--', label='Courbe gaussienne ajustée')
 
         plt.xlabel('Énergie [channel]')
@@ -204,12 +209,13 @@ class Data_analysis:
         float: Total count number.
         """
         x_data = np.arange(len(spectrum))
-        gaussian_curve = self.gaussian_function(x_data, gaussian_params['A'], gaussian_params['mu'], gaussian_params['sigma'])
+        gaussian_curve = self.gaussian_function(x_data, gaussian_params['A'], gaussian_params['mu'], gaussian_params['sigma'], gaussian_params['a'], gaussian_params['b'])
         return int(np.sum(gaussian_curve))
 
 # application
 data_analysis = Data_analysis()
-folder_path = 'Donnees1/mesures_init/txt/'
+folder_path = 'Donnees1/spec_diffuseurs/txt/'
+
 file_directories = data_analysis.list_files_in_folder(folder_path)
 print(file_directories)
 
@@ -220,7 +226,7 @@ for file in file_directories:
     # print(raw_data)
 
     # Get measuring time for a specific file
-    measuring_time = data_analysis.get_measuring_time(file_directories[0])
+    measuring_time = data_analysis.get_measuring_time(file)
     print("temps d'acquisition : ", measuring_time)
 
     # Find ROI limits
@@ -243,5 +249,5 @@ for file in file_directories:
             total_count = data_analysis.calculate_total_count(raw_data, gaussian_params)
             print("    nombre de comptes total : ", total_count)
 
-        except:
+        except Exception as e:
             0

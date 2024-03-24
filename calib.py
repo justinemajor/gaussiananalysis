@@ -45,7 +45,7 @@ for file in file_directories:
     # print(raw_data)
 
     # Get measuring time for a specific file
-    measuring_time = data_analysis.get_measuring_time(file_directories[0])
+    measuring_time = data_analysis.get_measuring_time(file)
     print("temps d'acquisition : ", measuring_time)
 
     # Find ROI limits

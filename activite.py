@@ -2,6 +2,7 @@ import numpy as np
 import datetime
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
+from lab_analysis import Data_analysis
 
 def activite_actuelle(date_initiale, radioactivite_initiale_uc, demi_vie, unite_demi_vie='jours'):
     """
