@@ -2,33 +2,33 @@ Donnees1/spec_ang/txt/al_60.txt
 temps d'acquisition :  331
 Indice de la ROI :  0
     centroïde :  410.6022192705793 4.882711080479149  keV
-    FWHM :  -172.308 2.233
+    FWHM :  172.308 2.233
     nombre de comptes normalisé :  48.89728096676737
 
 Donnees1/spec_ang/txt/al_75.txt
 temps d'acquisition :  599
 Indice de la ROI :  0
     centroïde :  345.37162050261156 4.538456650373018  keV
-    FWHM :  -140.116 1.421
+    FWHM :  140.116 1.421
     nombre de comptes normalisé :  34.48747913188648
 
 Donnees1/spec_ang/txt/al_110.txt
 temps d'acquisition :  663
 Indice de la ROI :  0
     centroïde :  249.58797878794002 4.126710293060737  keV
-    FWHM :  -90.015 0.839
+    FWHM :  90.015 0.839
     nombre de comptes normalisé :  16.11915535444947
 
 Donnees1/spec_ang/txt/al_90.txt
 temps d'acquisition :  627
 Indice de la ROI :  0
     centroïde :  297.24761119050254 4.3271641209884475  keV
-    FWHM :  -111.979 1.096
+    FWHM :  111.979 1.096
     nombre de comptes normalisé :  24.73524720893142
 
 Donnees1/spec_ang/txt/al_45.txt
 temps d'acquisition :  597
 Indice de la ROI :  0
     centroïde :  484.6768397787242 5.107310481829668  keV
-    FWHM :  -186.117 2.079
+    FWHM :  186.117 2.079
     nombre de comptes normalisé :  102.57286432160804

@@ -35,7 +35,7 @@ plt.show()
 
 # application
 data_analysis = Data_analysis()
-folder_path = 'Donnees1/spec_diffuseurs/txt/'
+folder_path = 'Donnees1/spec_ang/txt/'
 file_directories = data_analysis.list_files_in_folder(folder_path)
 
 for file in file_directories:

@@ -166,7 +166,7 @@ class Data_analysis:
         # Calculate errors
         perr = np.sqrt(np.diag(pcov))
 
-        return {'mu': popt[1], 'mu_error': perr[1], 'sigma': popt[2], 'sigma_error': perr[2], 'A':popt[0], 'a':popt[3], 'b':popt[4]}
+        return {'mu': popt[1], 'mu_error': perr[1], 'sigma': abs(popt[2]), 'sigma_error': perr[2], 'A':popt[0], 'a':popt[3], 'b':popt[4]}
 
     def plot_spectrum_with_roi(self, file, spectrum, roi_limits, gaussian_params=None):
         """
