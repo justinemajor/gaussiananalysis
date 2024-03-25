@@ -8,16 +8,16 @@ from lab_analysis import Data_analysis
 valeurs_calibrees = np.array([31, 81, 356, 122, 662, 511])
 
 # calibration pour Donnees1
-# data_type = ".txt"
-# indices_connu = np.array([89.18195171624912, 225.22477063739933, 907.3673017230627, 332.80225678111793, 1630.5176612913885, 1276.4063097242545])
+data_type = ".txt"
+indices_connu = np.array([89.18195171624912, 225.22477063739933, 907.3673017230627, 332.80225678111793, 1630.5176612913885, 1276.4063097242545])
 
 # calibration pour Donnees2 - fixe
 # data_type = "fixe"
 # indices_connu = np.array([296.0978926149062, 921.2635968006008, 3936.4071297508494, 1387.5355513300294, 7000.837661871095, 5507.799309382738])
 
 # calibration pour Donnees2 - mobile
-data_type = "mobile"
-indices_connu = np.array([182.53096167711857, 481.73852791480573, 1903.007495986019, 708.9043529372805, 3367.1005554765425, 2659.326003318573])
+# data_type = "mobile"
+# indices_connu = np.array([182.53096167711857, 481.73852791480573, 1903.007495986019, 708.9043529372805, 3367.1005554765425, 2659.326003318573])
 
 
 indices_connu = np.sort(indices_connu)
@@ -50,7 +50,7 @@ plt.show()
 
 # application
 data_analysis = Data_analysis()
-folder_path = 'Donnees2/angles/txt/'
+folder_path = 'Donnees1/mesures_init/txt/'
 file_directories = data_analysis.list_files_in_folder(folder_path)
 
 for file in file_directories:
@@ -78,7 +78,7 @@ for file in file_directories:
 
             try :
                 # Fit Gaussian to ROI
-                bruit = True
+                bruit = False
                 upper = roi_limits[1,ind]
 
                 if "mobile" in file:

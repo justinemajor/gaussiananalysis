@@ -1,0 +1,34 @@
+Donnees1/mesures_init/txt/fer_0.txt
+temps d'acquisition :  195
+Indice de la ROI :  0
+    centroïde :  662.3161360224204 5.446994294130922  keV
+    FWHM :  126.398 0.513
+    nombre de comptes normalisé :  1642.625641025641 11.326086002220272
+
+Donnees1/mesures_init/txt/plexi_0.txt
+temps d'acquisition :  100
+Indice de la ROI :  0
+    centroïde :  660.0158976209455 5.424497441212145  keV
+    FWHM :  127.739 0.409
+    nombre de comptes normalisé :  4539.41 52.131614378463325
+
+Donnees1/mesures_init/txt/aluminium_0.txt
+temps d'acquisition :  120
+Indice de la ROI :  0
+    centroïde :  661.8816073270356 5.4307997625784346  keV
+    FWHM :  127.077 0.411
+    nombre de comptes normalisé :  3646.8083333333334 35.90278832394886
+
+Donnees1/mesures_init/txt/sans_diffuseur_0.txt
+temps d'acquisition :  83
+Indice de la ROI :  0
+    centroïde :  653.721441792277 5.4074962179450505  keV
+    FWHM :  129.174 0.438
+    nombre de comptes normalisé :  5691.44578313253 76.8524351746035
+
+Donnees1/mesures_init/txt/source_obstruee_0.txt
+temps d'acquisition :  276
+Indice de la ROI :  0
+    centroïde :  656.2008763294946 5.420880788559586  keV
+    FWHM :  121.255 0.475
+    nombre de comptes normalisé :  1017.6231884057971 5.607207337150108
