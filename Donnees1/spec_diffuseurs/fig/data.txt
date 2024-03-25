@@ -3,39 +3,39 @@ temps d'acquisition :  621
 Indice de la ROI :  1
     centroïde :  408.92833046513584 5.495006858044832  keV
     FWHM :  138.976 6.278
-    nombre de comptes normalisé :  1.8325281803542672
+    nombre de comptes normalisé :  1.8325281803542672 0.057273403811948884
 
 Donnees1/spec_diffuseurs/txt/fe_60.txt
 temps d'acquisition :  311
 Indice de la ROI :  0
     centroïde :  416.18006704075566 5.061445277698726  keV
     FWHM :  182.802 4.191
-    nombre de comptes normalisé :  26.520900321543408
+    nombre de comptes normalisé :  26.520900321543408 0.37729710816554735
 
 Donnees1/spec_diffuseurs/txt/al2_60.txt
 temps d'acquisition :  360
 Indice de la ROI :  0
     centroïde :  409.24116924538265 5.071634805384755  keV
     FWHM :  165.487 4.85
-    nombre de comptes normalisé :  14.119444444444444
+    nombre de comptes normalisé :  14.119444444444444 0.23726279325157937
 
 Donnees1/spec_diffuseurs/txt/plexi_60.txt
 temps d'acquisition :  328
 Indice de la ROI :  0
     centroïde :  409.0228091286161 5.12334819825953  keV
     FWHM :  169.035 5.162
-    nombre de comptes normalisé :  13.054878048780488
+    nombre de comptes normalisé :  13.054878048780488 0.2393044836729025
 
 Donnees1/spec_diffuseurs/txt/al1_60.txt
 temps d'acquisition :  331
 Indice de la ROI :  0
     centroïde :  410.904721021309 5.011308943380486  keV
     FWHM :  175.547 3.949
-    nombre de comptes normalisé :  21.259818731117825
+    nombre de comptes normalisé :  21.259818731117825 0.3176635868767995
 
 Donnees1/spec_diffuseurs/txt/al3_60.txt
 temps d'acquisition :  581
 Indice de la ROI :  1
     centroïde :  408.4897157671176 5.000595649910791  keV
     FWHM :  142.504 4.068
-    nombre de comptes normalisé :  6.93631669535284
+    nombre de comptes normalisé :  6.93631669535284 0.12120240565880956
