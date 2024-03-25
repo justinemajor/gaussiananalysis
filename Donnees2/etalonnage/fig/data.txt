@@ -1,0 +1,67 @@
+Donnees2/etalonnage/txt/cs_137_662_mobile.txt
+temps d'acquisition :  202
+nombre de ROI :  2
+Indice de la ROI :  1
+     {'mu': 3367.1005554765425, 'mu_error': 1.3528018433454418, 'sigma': 102.42675987354995, 'sigma_error': 1.703163275668235, 'A': 54.00254797111442, 'a': 0, 'b': 0}
+    nombre de comptes total :  13198
+
+Donnees2/etalonnage/txt/na_22_511_mobile.txt
+temps d'acquisition :  93
+nombre de ROI :  1
+Indice de la ROI :  0
+     {'mu': 2659.326003318573, 'mu_error': 0.8126560157728914, 'sigma': 95.18423408589813, 'sigma_error': 1.0039299355608018, 'A': 141.10080399821072, 'a': 0, 'b': 0}
+    nombre de comptes total :  31854
+
+Donnees2/etalonnage/txt/na_22_511_fixe.txt
+temps d'acquisition :  231
+nombre de ROI :  2
+Indice de la ROI :  1
+     {'mu': 5507.799309382738, 'mu_error': 1.0660246062057506, 'sigma': 239.10555997132192, 'sigma_error': 1.4382139251283175, 'A': 247.54851657587915, 'a': 0, 'b': 0}
+    nombre de comptes total :  137630
+
+Donnees2/etalonnage/txt/co_57_122_fixe.txt
+temps d'acquisition :  186
+nombre de ROI :  2
+Indice de la ROI :  1
+     {'mu': 1387.5355513300294, 'mu_error': 0.7781199749201924, 'sigma': 103.9769167077451, 'sigma_error': 0.958012412574507, 'A': 178.0224740177497, 'a': 0, 'b': 0}
+    nombre de comptes total :  43981
+
+Donnees2/etalonnage/txt/cs_137_662_fixe.txt
+temps d'acquisition :  242
+nombre de ROI :  2
+Indice de la ROI :  1
+     {'mu': 7000.837661871095, 'mu_error': 2.7913368855598684, 'sigma': 264.6679574323657, 'sigma_error': 3.7889728726695444, 'A': 38.86706202821357, 'a': 0, 'b': 0}
+    nombre de comptes total :  24045
+
+Donnees2/etalonnage/txt/ba_133_31_81_356_fixe.txt
+temps d'acquisition :  180
+nombre de ROI :  4
+Indice de la ROI :  0
+     {'mu': 296.0978926149062, 'mu_error': 0.22822323644130665, 'sigma': 52.50601593936369, 'sigma_error': 0.27488767093844596, 'A': 1640.1340500663707, 'a': 0, 'b': 0}
+    nombre de comptes total :  205086
+Indice de la ROI :  2
+     {'mu': 921.2635968006008, 'mu_error': 0.2907925811609367, 'sigma': 81.5238416902141, 'sigma_error': 0.3979980530966094, 'A': 1274.6514425231271, 'a': 0, 'b': 0}
+    nombre de comptes total :  239962
+Indice de la ROI :  3
+     {'mu': 3936.4071297508494, 'mu_error': 0.9510550341014323, 'sigma': 226.6900624786778, 'sigma_error': 1.0945252944331867, 'A': 319.3279157479466, 'a': 0, 'b': 0}
+    nombre de comptes total :  179333
+
+Donnees2/etalonnage/txt/co_57_122_mobile.txt
+temps d'acquisition :  184
+nombre de ROI :  2
+Indice de la ROI :  1
+     {'mu': 708.9043529372805, 'mu_error': 0.44680194564618514, 'sigma': 34.502727202595715, 'sigma_error': 0.5193596543482919, 'A': 145.98246088002116, 'a': 0, 'b': 0}
+    nombre de comptes total :  12060
+
+Donnees2/etalonnage/txt/ba_133_31_81_356_mobile.txt
+temps d'acquisition :  114
+nombre de ROI :  3
+Indice de la ROI :  0
+     {'mu': 182.53096167711857, 'mu_error': 0.11109054210948104, 'sigma': 19.382351305406388, 'sigma_error': 0.1190282873099281, 'A': 1476.108673365551, 'a': 0, 'b': 0}
+    nombre de comptes total :  70125
+Indice de la ROI :  1
+     {'mu': 481.73852791480573, 'mu_error': 0.25104722835076726, 'sigma': 29.383755777160168, 'sigma_error': 0.30343145089318024, 'A': 581.1456329091409, 'a': 0, 'b': 0}
+    nombre de comptes total :  40727
+Indice de la ROI :  2
+     {'mu': 1903.007495986019, 'mu_error': 0.5641348102204444, 'sigma': 82.48189841147288, 'sigma_error': 0.7421976370387912, 'A': 237.26224957535302, 'a': 0, 'b': 0}
+    nombre de comptes total :  45836

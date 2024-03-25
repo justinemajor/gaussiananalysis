@@ -104,7 +104,7 @@ class Data_analysis:
         # threshold = np.mean(y_smoothed)+20
 
         #find the maximums
-        peaks_idx_max, _ = find_peaks(y_smoothed, height=threshold, width=30)
+        peaks_idx_max, _ = find_peaks(y_smoothed, height=threshold, width=80)  # 30 with Donnees1 and 80 with Donnees2
         # print('max', peaks_idx_max)
         widths = peak_widths(y_smoothed, peaks_idx_max, rel_height=0.7)
         widths = np.array(widths[0])
@@ -117,7 +117,7 @@ class Data_analysis:
 
         return peaks_limits
 
-    def gaussian_function(self, x, A, mu, sigma, a, b):
+    def gaussian_function(self, x, A, mu, sigma, a=0, b=0):
         """
         Gaussian function.
 
@@ -132,7 +132,7 @@ class Data_analysis:
         """
         return A * np.exp(-(x - mu)**2 / (2 * sigma**2)) + a*x + b
 
-    def fit_gaussian_to_roi(self, spectrum, lower_limit, upper_limit):
+    def fit_gaussian_to_roi(self, spectrum, lower_limit, upper_limit, bruit=True):
         """
         Fit a Gaussian curve to an ROI in the spectrum.
 
@@ -140,6 +140,7 @@ class Data_analysis:
         spectrum (numpy.ndarray): Raw spectrum data.
         lower_limit (int): Lower limit of the ROI.
         upper_limit (int): Upper limit of the ROI.
+        bruit (bool): Is this a Gaussian fitting with background
 
         Returns:
         dict: Dictionary with optimal mu, sigma, and their errors.
@@ -147,8 +148,9 @@ class Data_analysis:
         x_data = np.arange(len(spectrum))
         y_data = spectrum
 
-        lower_limit = max(0, lower_limit-300)
-        upper_limit = min(len(y_data), upper_limit+50)
+        if bruit:
+            lower_limit = max(0, lower_limit-300)
+            upper_limit = min(len(y_data), upper_limit+50)
 
         roi_x = x_data[lower_limit:upper_limit+1]
         roi_y = y_data[lower_limit:upper_limit+1]
@@ -161,12 +163,19 @@ class Data_analysis:
         b_guess = np.mean(roi_y[:300])
 
         # Perform curve fitting
-        popt, pcov = curve_fit(self.gaussian_function, roi_x, roi_y, p0=[A_guess, mu_guess, sigma_guess, a_guess, b_guess])
+        if bruit:
+            popt, pcov = curve_fit(self.gaussian_function, roi_x, roi_y, p0=[A_guess, mu_guess, sigma_guess, a_guess, b_guess])
+            a = popt[3]
+            b = popt[4]
+        else:
+            popt, pcov = curve_fit(self.gaussian_function, roi_x, roi_y, p0=[A_guess, mu_guess, sigma_guess])
+            a = 0
+            b = 0
 
         # Calculate errors
         perr = np.sqrt(np.diag(pcov))
 
-        return {'mu': popt[1], 'mu_error': perr[1], 'sigma': abs(popt[2]), 'sigma_error': perr[2], 'A':popt[0], 'a':popt[3], 'b':popt[4]}
+        return {'mu': popt[1], 'mu_error': perr[1], 'sigma': abs(popt[2]), 'sigma_error': perr[2], 'A':popt[0], 'a':a, 'b':b}
 
     def plot_spectrum_with_roi(self, file, spectrum, roi_limits, gaussian_params=None):
         """
@@ -219,7 +228,7 @@ class Data_analysis:
 
 if __name__ == "__main__":
     data_analysis = Data_analysis()
-    folder_path = 'Donnees1/spec_ang/txt/'
+    folder_path = 'Donnees2/angles/txt/'
 
     file_directories = data_analysis.list_files_in_folder(folder_path)
     print(file_directories)
@@ -243,16 +252,33 @@ if __name__ == "__main__":
 
             try :
                 # Fit Gaussian to ROI
-                gaussian_params = data_analysis.fit_gaussian_to_roi(raw_data, lower, roi_limits[1,ind])
+                bruit = True
+                upper = roi_limits[1,ind]
+
+                if "mobile" in file:
+                    bruit = True
+                elif "fixe" in file:
+                    bruit = False
+                
+                if "ba_133_31_81_356_fixe" in file and ind == 3:
+                    lower += 250
+                elif "45_mobile" in file and ind == 0:
+                    lower += 800
+                    upper -= 900
+                elif "_fixe" in file:
+                    lower -= 200
+                    upper += 300
+
+                gaussian_params = data_analysis.fit_gaussian_to_roi(raw_data, lower, upper, bruit=bruit)
                 print("    ", gaussian_params)
 
                 # Plot spectrum with ROI(s) and fitted Gaussian curve
                 file = file.replace('.txt', '').replace('txt', 'fig')
-                data_analysis.plot_spectrum_with_roi([file, ind], raw_data, [lower,roi_limits[1,ind]], gaussian_params)
+                data_analysis.plot_spectrum_with_roi([file, ind], raw_data, [lower,upper], gaussian_params)
 
                 # Calculate total count within fitted Gaussian
-                total_count = data_analysis.calculate_total_count(raw_data, gaussian_params, roi_limits[1,ind])
+                total_count = data_analysis.calculate_total_count(raw_data, gaussian_params, upper)
                 print("    nombre de comptes total : ", total_count)
 
             except Exception as e:
-                0
+                raise(e)

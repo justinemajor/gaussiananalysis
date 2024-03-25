@@ -4,10 +4,25 @@ from scipy.optimize import curve_fit
 from scipy.signal import find_peaks
 from lab_analysis import Data_analysis
 
-# Supposons que vous ayez des valeurs connues et leurs indices correspondants
-# indices_connu = np.array([311.151, 1509.071, 1886.314, 2612.035, 2961.651])
-indices_connu = np.array([89.18195171624912, 225.22477063739933, 907.3673017230627, 332.80225678111793, 1630.5176612913885, 1276.4063097242545])
+
 valeurs_calibrees = np.array([31, 81, 356, 122, 662, 511])
+
+# calibration pour Donnees1
+# data_type = ".txt"
+# indices_connu = np.array([89.18195171624912, 225.22477063739933, 907.3673017230627, 332.80225678111793, 1630.5176612913885, 1276.4063097242545])
+
+# calibration pour Donnees2 - fixe
+# data_type = "fixe"
+# indices_connu = np.array([296.0978926149062, 921.2635968006008, 3936.4071297508494, 1387.5355513300294, 7000.837661871095, 5507.799309382738])
+
+# calibration pour Donnees2 - mobile
+data_type = "mobile"
+indices_connu = np.array([182.53096167711857, 481.73852791480573, 1903.007495986019, 708.9043529372805, 3367.1005554765425, 2659.326003318573])
+
+
+indices_connu = np.sort(indices_connu)
+valeurs_calibrees = np.sort(valeurs_calibrees)
+
 
 # Fonction pour ajuster les données connues
 def fonction_calibration(x, a, b):
@@ -35,52 +50,69 @@ plt.show()
 
 # application
 data_analysis = Data_analysis()
-folder_path = 'Donnees1/spec_ang/txt/'
+folder_path = 'Donnees2/angles/txt/'
 file_directories = data_analysis.list_files_in_folder(folder_path)
 
 for file in file_directories:
     print(file)
-    # Read raw data from a file
-    raw_data = data_analysis.read_raw_data(file)
-    # print(raw_data)
 
-    # Get measuring time for a specific file
-    measuring_time = data_analysis.get_measuring_time(file)
-    print("temps d'acquisition : ", measuring_time)
+    if data_type in file:
+        # Read raw data from a file
+        raw_data = data_analysis.read_raw_data(file)
+        # print(raw_data)
 
-    # Find ROI limits
-    roi_limits = data_analysis.find_roi_limits(raw_data)
-    # print("nombre de ROI : ", len(roi_limits[0]))
+        # Get measuring time for a specific file
+        measuring_time = data_analysis.get_measuring_time(file)
+        print("temps d'acquisition : ", measuring_time)
 
-    x_ch = np.arange(len(raw_data))
-    # Calibration des indices des données
-    x = calibrer_axe_x(x_ch)
+        # Find ROI limits
+        roi_limits = data_analysis.find_roi_limits(raw_data)
+        # print("nombre de ROI : ", len(roi_limits[0]))
 
-    for ind, lower in enumerate(roi_limits[0]):
-        print("Indice de la ROI : ", ind)
+        x_ch = np.arange(len(raw_data))
+        # Calibration des indices des données
+        x = calibrer_axe_x(x_ch)
 
-        try :
-            # Fit Gaussian to ROI
-            gaussian_params = data_analysis.fit_gaussian_to_roi(raw_data, lower, roi_limits[1,ind])
-            # print("    ", gaussian_params)
-            # pour le na22
-            cen = gaussian_params['mu']
-            cen_err = gaussian_params['mu_error']
-            cen = calibrer_axe_x(cen)
-            # cen_err = a*cen*np.sqrt((a_err/a)**2+(cen_err/cen)**2)+b_err
-            cen_err = a*cen*(a_err/a+cen_err/cen)+b_err
-            print("    centroïde : ", cen, cen_err, ' keV')
+        for ind, lower in enumerate(roi_limits[0]):
+            print("Indice de la ROI : ", ind)
 
-            # Extraction des paramètres ajustés
-            facteur = 2*np.sqrt(2*np.log(2))
-            fwhm_err = gaussian_params['sigma_error']*facteur
-            fwhm = gaussian_params['sigma']*facteur
-            print('    FWHM : ', round(fwhm,3), round(fwhm_err,3))
+            try :
+                # Fit Gaussian to ROI
+                bruit = True
+                upper = roi_limits[1,ind]
 
-            # Calculate total count within fitted Gaussian
-            total_count = data_analysis.calculate_total_count(raw_data, gaussian_params, roi_limits[1,ind])
-            tc_err = (np.sqrt(total_count)/total_count+1/measuring_time)*total_count/measuring_time
-            print("    nombre de comptes normalisé : ", total_count/measuring_time, tc_err)
+                if "mobile" in file:
+                    bruit = True
+                elif "fixe" in file:
+                    bruit = False
+                
+                if "45_mobile" in file and ind == 0:
+                    lower += 800
+                    upper -= 900
+                elif "_fixe" in file:
+                    lower -= 200
+                    upper += 300
 
-        except Exception as e:
-            raise(e)
+                gaussian_params = data_analysis.fit_gaussian_to_roi(raw_data, lower, upper, bruit=bruit)
+                # print("    ", gaussian_params)
+                # pour le na22
+                cen = gaussian_params['mu']
+                cen_err = gaussian_params['mu_error']
+                cen = calibrer_axe_x(cen)
+                # cen_err = a*cen*np.sqrt((a_err/a)**2+(cen_err/cen)**2)+b_err
+                cen_err = a*cen*(a_err/a+cen_err/cen)+b_err
+                print("    centroïde : ", cen, cen_err, ' keV')
+
+                # Extraction des paramètres ajustés
+                facteur = 2*np.sqrt(2*np.log(2))
+                fwhm_err = gaussian_params['sigma_error']*facteur
+                fwhm = gaussian_params['sigma']*facteur
+                print('    FWHM : ', round(fwhm,3), round(fwhm_err,3))
+
+                # Calculate total count within fitted Gaussian
+                total_count = data_analysis.calculate_total_count(raw_data, gaussian_params, upper)
+                tc_err = (np.sqrt(total_count)/total_count+1/measuring_time)*total_count/measuring_time
+                print("    nombre de comptes normalisé : ", total_count/measuring_time, tc_err)
+
+            except Exception as e:
+                raise(e)

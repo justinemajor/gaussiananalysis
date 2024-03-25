@@ -1,0 +1,71 @@
+Donnees2/angles/txt/ang_110_fixe.txt
+temps d'acquisition :  1701
+Indice de la ROI :  0
+    centroïde :  427.9927595377146 6.010448968062331  keV
+    FWHM :  822.98 8.968
+    nombre de comptes normalisé :  9.186360964138743 0.07888910105828384
+
+Donnees2/angles/txt/ang_75_fixe.txt
+temps d'acquisition :  1001
+Indice de la ROI :  0
+    centroïde :  329.0085861986625 5.9572444601002825  keV
+    FWHM :  831.075 10.877
+    nombre de comptes normalisé :  10.933066933066932 0.11543121036767541
+
+Donnees2/angles/txt/ang_90_fixe.txt
+temps d'acquisition :  1201
+Indice de la ROI :  0
+    centroïde :  381.12805365559063 6.012876570490097  keV
+    FWHM :  836.915 10.564
+    nombre de comptes normalisé :  9.996669442131557 0.09955750511959166
+
+Donnees2/angles/txt/ang_45_fixe.txt
+temps d'acquisition :  1452
+Indice de la ROI :  0
+    centroïde :  188.35927695155502 5.652612262337268  keV
+    FWHM :  872.998 7.486
+    nombre de comptes normalisé :  16.701101928374655 0.11875014941621834
+
+Donnees2/angles/txt/ang_60_fixe.txt
+temps d'acquisition :  809
+Indice de la ROI :  0
+    centroïde :  263.845770665512 5.918388327917103  keV
+    FWHM :  888.111 12.229
+    nombre de comptes normalisé :  13.405438813349814 0.1452963764642874
+
+
+
+Donnees2/angles/txt/ang_90_mobile.txt
+temps d'acquisition :  1072
+Indice de la ROI :  0
+    centroïde :  311.21528127578557 6.253136242029697  keV
+    FWHM :  363.479 6.39
+    nombre de comptes normalisé :  21.503731343283583 0.1616908417504865
+
+Donnees2/angles/txt/ang_110_mobile.txt
+temps d'acquisition :  1526
+Indice de la ROI :  0
+    centroïde :  271.03851743615974 6.025421751609114  keV
+    FWHM :  295.308 4.383
+    nombre de comptes normalisé :  19.86631716906946 0.1271174454508286
+
+Donnees2/angles/txt/ang_60_mobile.txt
+temps d'acquisition :  720
+Indice de la ROI :  0
+    centroïde :  424.6670415558982 6.743373874976945  keV
+    FWHM :  488.879 9.793
+    nombre de comptes normalisé :  31.53611111111111 0.2530850183723271
+
+Donnees2/angles/txt/ang_45_mobile.txt
+temps d'acquisition :  1328
+Indice de la ROI :  0
+    centroïde :  495.4613874554076 6.821311229760994  keV
+    FWHM :  548.527 8.145
+    nombre de comptes normalisé :  43.11144578313253 0.21263956883323437
+
+Donnees2/angles/txt/ang_75_mobile.txt
+temps d'acquisition :  890
+Indice de la ROI :  0
+    centroïde :  359.82932284455404 6.522774612524589  keV
+    FWHM :  416.775 8.906
+    nombre de comptes normalisé :  23.564044943820225 0.18919232696950633
