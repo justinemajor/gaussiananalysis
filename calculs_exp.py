@@ -92,21 +92,6 @@ def erreur_angle_solide(A, err_A, d, err_d):
     return np.sqrt((d_dA * err_A)**2 + (d_dd * err_d)**2)
 
 
-def nombre_coups_par_seconde(coups, t_coups, bruit, t_bruit):
-    return coups/t_coups - bruit/t_bruit
-
-def correction_attenuation(coups_sec, mu, d_cible):
-    return coups_sec / np.exp(-mu*d_cible/2)
-
-def correction_efficacite_detecteur(coups_sec, eff):
-    return coups_sec/eff
-
-def section_efficace_diff_exp(coups_sec, flux_inc, n, angle_solide):
-    return coups_sec / (flux_inc*n*angle_solide)
-
-efficacites = []
-
-
 loop = ['plexi', 'al', 'fe', 'al_moyen', 'al_petit', 'al_mini']
 proprietes_diff = {}
 
@@ -118,7 +103,7 @@ for cible in loop:
     rho = density[material]
     M = masse_molaire[material]
     nbre_elec_atom = Z[material]
-        
+
     l_moy_faisceau = largeur_moyenne_faisceau_cible(d_cible=D_cible)
     err_l_moy = erreur_largeur_moyenne_faisceau_cible(l_moy=l_moy_faisceau, d_cible=D_cible, err_d_cible=err_dia_cible)
     A_faisceau_cible = aire_faisceau_cible(l=l_moy_faisceau, h=D_faisceau_cible)
@@ -142,15 +127,17 @@ for cible in loop:
     nbre_elec_cm3 = nombre_electrons_cm3(rho=rho, M=M, Z=nbre_elec_atom, NA=NA)
     print(f'Densite electrons cible : {nbre_elec_cm3}')
 
-    nbre_elec_cm2 = nbre_elec_cm3 * D_cible
-    err_nbre_elec_cm2 = err_dia_cible / D_cible * nbre_elec_cm2
+    #nbre_elec_cm2 = nbre_elec_cm3 * D_cible
+    #err_nbre_elec_cm2 = err_dia_cible / D_cible * nbre_elec_cm2
+    nbre_elec_cm2 = nbre_elec_cm3 * l_moy_faisceau
+    err_nbre_elec_cm2 = err_l_moy / l_moy_faisceau * nbre_elec_cm2
     print(f'Densite surface electrons cible : {nbre_elec_cm2} +- {err_nbre_elec_cm2}')
-        
+
 
     A_eff_det = aire_efficace_detecteur(d=D_detecteur)
     err_A_eff_det = erreur_aire_efficace_detecteur(aire_eff=A_eff_det, d=D_detecteur, err_d=err_D_detecteur)
-    angle_solide_det = angle_solide(aire_eff=A_eff_det, d=d_detecteur_cible)
-    err_angle_solide_det = erreur_angle_solide(A=A_eff_det, err_A=err_A_eff_det, d=d_detecteur_cible, err_d=err_d_detecteur_cible)
+    angle_solide_det = angle_solide(aire_eff=A_eff_det, d=(d_detecteur_cible+d_source_cible))
+    err_angle_solide_det = erreur_angle_solide(A=A_eff_det, err_A=err_A_eff_det, d=(d_detecteur_cible+d_source_cible), err_d=(err_d_detecteur_cible+err_d_source_cible))
 
     angle_solide_pm = uncertainties.ufloat(angle_solide_det, err_angle_solide_det)
     print(f'angle solide : {angle_solide_pm:.1u} steradian')

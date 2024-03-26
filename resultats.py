@@ -58,6 +58,16 @@ def erreur_attenuation_coefficient(coups_s, err_coups_s, ref_coups_s, err_ref_co
     return np.sqrt((d_dI0*err_ref_coups_s)**2 + (d_dI*err_coups_s)**2 + (d_dd*err_d_cible)**2)
 
 
+def attenuation_flux_incident(flux, mu, d_cible):
+    return flux * np.exp(-mu*d_cible/2)
+
+def erreur_attenuation_flux_incident(flux, err_flux, mu, err_mu, d_cible, err_d_cible):
+    d_dI = np.exp(-mu*d_cible/2)
+    d_dmu = -flux*d_cible/2*np.exp(-mu*d_cible/2)
+    d_dd = -flux*mu/2*np.exp(-mu*d_cible/2)
+    return np.sqrt((d_dI*err_flux)**2 + (d_dmu*err_mu)**2 + (d_dd*err_d_cible)**2)
+
+
 def correction_attenuation(coups_sec, mu, d_cible):
     return coups_sec / np.exp(-mu*d_cible/2)
 
@@ -236,6 +246,11 @@ for acquisition in loop:
         mu_pm = uncertainties.ufloat(mu, err_mu)
         print(f"Coefficient d'atténuation : {mu_pm:.1u}")
 
+    I_inc_att = attenuation_flux_incident(flux=I_inc, mu=attenuation_coef[description[0]][0], d_cible=D_cible)
+    err_I_inc_att = erreur_attenuation_flux_incident(flux=I_inc, err_flux=err_I_inc, mu=attenuation_coef[description[0]][0], err_mu=attenuation_coef[description[0]][1], d_cible=D_cible, err_d_cible=err_dia_cible)
+    I_inc_att_pm = uncertainties.ufloat(I_inc_att, err_I_inc_att)
+    print(f'Flux incident atténué : {I_inc_att_pm:.1u}')
+
     nbre_coups_sec_mu_corr = correction_attenuation(coups_sec=nbre_coups_sec_nocorr, mu=attenuation_coef_th_diff[acquisition], d_cible=D_cible)
     err_nbre_coups_sec_mu_corr = erreur_correction_attenuation(coups_sec=nbre_coups_sec_nocorr, err_coups_sec=err_nbre_coups_sec_nocorr, mu=attenuation_coef_th_diff[acquisition], err_mu=0, d_cible=D_cible, err_d_cible=err_dia_cible)
 
@@ -246,8 +261,8 @@ for acquisition in loop:
 
     nbre_coups_net_par_sec[acquisition] = (nbre_coups_sec_corr, err_nbre_coups_sec_corr)
 
-    section_eff = section_efficace_diff_exp(coups_sec=nbre_coups_sec_corr, flux_inc=I_inc, n=nbre_elec, angle_solide=angle_solide)
-    err_section_eff = erreur_section_efficace_diff_exp(section_eff=section_eff, coups_sec=nbre_coups_sec_corr, err_coups_sec=err_nbre_coups_sec_corr, flux_inc=I_inc, err_flux_inc=err_I_inc, n=nbre_elec, err_n=err_nbre_elec, angle_solide=angle_solide, err_angle_solide=err_angle_solide)
+    section_eff = section_efficace_diff_exp(coups_sec=nbre_coups_sec_corr, flux_inc=I_inc_att, n=nbre_elec, angle_solide=angle_solide)
+    err_section_eff = erreur_section_efficace_diff_exp(section_eff=section_eff, coups_sec=nbre_coups_sec_corr, err_coups_sec=err_nbre_coups_sec_corr, flux_inc=I_inc_att, err_flux_inc=err_I_inc_att, n=nbre_elec, err_n=err_nbre_elec, angle_solide=angle_solide, err_angle_solide=err_angle_solide)
     section_eff_pm = uncertainties.ufloat(section_eff, err_section_eff)
     print(f'Section efficace : {section_eff_pm:.1u}')
     
@@ -259,17 +274,44 @@ for acquisition in loop:
     print(f'Fraction des électrons diffusés : {frac_diff_pm:.1u}')
 
 
+### fonctions generales pour graph
+    
+def func_lineaire(x, a, b):
+    return a*x +b
+
+def func_quadratique(x, a):
+    return a*x**2
+
+def r_squared(function, xdata, ydata, popt):
+    residuals = ydata- function(xdata, *popt)
+    ss_res = np.sum(residuals**2)
+    ss_tot = np.sum((ydata-np.mean(ydata))**2)
+    r_squared = 1 - (ss_res / ss_tot)
+    return r_squared
+
+
 
 ### graph nombre de coups net (Net area)/sec en fonction de Z pour un angle fixe pour les diffuseurs de même taille physique
 
 def graph_nbre_coups_fct_Z(nbre_coups_sec:dict, Z:dict):
-    coups = [nbre_coups_sec['plexi_60'][0], nbre_coups_sec['al_60'][0], nbre_coups_sec['fe_60'][0]]
-    err_coups = [nbre_coups_sec['plexi_60'][1], nbre_coups_sec['al_60'][1], nbre_coups_sec['fe_60'][1]]
-    z = [Z['plexi'], Z['al'], Z['fe']]
-    plt.plot(z, coups, 'k.')
+    coups = np.array([nbre_coups_sec['plexi_60'][0], nbre_coups_sec['al_60'][0], nbre_coups_sec['fe_60'][0]])
+    err_coups = np.array([nbre_coups_sec['plexi_60'][1], nbre_coups_sec['al_60'][1], nbre_coups_sec['fe_60'][1]])
+    z = np.array([Z['plexi'], Z['al'], Z['fe']])
+    plt.plot(z, coups, 'k.', label='Données')
     plt.errorbar(z, coups, yerr=err_coups, capsize=5, c='k', fmt='.')
+
+    x_axis = np.linspace(0, 30)
+    popt, pcov = opt.curve_fit(func_lineaire, z, coups)
+    std_popt = np.sqrt(np.diag(pcov))
+    r2 = r_squared(func_lineaire, z, coups, popt)
+    plt.plot(x_axis,func_lineaire(x_axis, *popt), 'k-', label=f'Régression ({popt[0]:.1f} $\pm$ {std_popt[0]:.1f}) x + ({popt[1]:.0f} $\pm$ {std_popt[1]:.0f})')
+    print(f'Régression linéaire ({popt[0]} +- {std_popt[0]}) x + ({popt[1]} +- {std_popt[1]})')
+    print(f'R squared = {r2}')
+
+    plt.legend(loc='best')
     plt.xlabel('Z')
     plt.ylabel('Nombre de coups net / sec')
+    plt.savefig('graph/Graph_coups_fct_Z.pdf')
     plt.show()
 
 graph_nbre_coups_fct_Z(nbre_coups_sec=nbre_coups_net_par_sec, Z=Z)
@@ -278,16 +320,31 @@ graph_nbre_coups_fct_Z(nbre_coups_sec=nbre_coups_net_par_sec, Z=Z)
 ### graph nombre de coups net(Net area)/sec en fonction de la taille ( é/cm2 ) pour un angle fixe et Z fixe
     
 def graph_nbre_coups_fct_densite_elec(nbre_coups_sec:dict, proprietes:dict):
-    coups = [nbre_coups_sec['al_60'][0], nbre_coups_sec['al_moyen_60'][0], nbre_coups_sec['al_petit_60'][0], nbre_coups_sec['al_mini_60'][0]]
-    err_coups = [nbre_coups_sec['al_60'][1], nbre_coups_sec['al_moyen_60'][1], nbre_coups_sec['al_petit_60'][1], nbre_coups_sec['al_mini_60'][1]]
+    coups = np.array([nbre_coups_sec['al_60'][0], nbre_coups_sec['al_moyen_60'][0], nbre_coups_sec['al_petit_60'][0], nbre_coups_sec['al_mini_60'][0]])
+    err_coups = np.array([nbre_coups_sec['al_60'][1], nbre_coups_sec['al_moyen_60'][1], nbre_coups_sec['al_petit_60'][1], nbre_coups_sec['al_mini_60'][1]])
     #densite = [proprietes['al']['densite elec'][0], proprietes['al_moyen']['densite elec'][0], proprietes['al_petit']['densite elec'][0], proprietes['al_mini']['densite elec'][0]]
-    densite_surf = [proprietes['al']['densite surface elec'][0], proprietes['al_moyen']['densite surface elec'][0], proprietes['al_petit']['densite surface elec'][0], proprietes['al_mini']['densite surface elec'][0]]
-    err_densite_surf = [proprietes['al']['densite surface elec'][1], proprietes['al_moyen']['densite surface elec'][1], proprietes['al_petit']['densite surface elec'][1], proprietes['al_mini']['densite surface elec'][1]]
-    plt.plot(densite_surf, coups, 'k.')
-    plt.errorbar(densite_surf, coups, xerr=err_densite_surf, yerr=err_coups, capsize=5, c='k', fmt='.')
+    densite_surf = np.array([proprietes['al']['densite surface elec'][0], proprietes['al_moyen']['densite surface elec'][0], proprietes['al_petit']['densite surface elec'][0], proprietes['al_mini']['densite surface elec'][0]])
+    err_densite_surf = np.array([proprietes['al']['densite surface elec'][1], proprietes['al_moyen']['densite surface elec'][1], proprietes['al_petit']['densite surface elec'][1], proprietes['al_mini']['densite surface elec'][1]])
+    plt.plot(densite_surf, coups, 'k.', label='Données')
+    #plt.errorbar(densite_surf, coups, xerr=err_densite_surf, yerr=err_coups, capsize=5, c='k', fmt='.')
+    plt.errorbar(densite_surf, coups, yerr=err_coups, capsize=5, c='k', fmt='.')
+
+    x_axis = np.linspace(0, 2e24)
+    popt, pcov = opt.curve_fit(func_quadratique, densite_surf, coups)
+    std_popt = np.sqrt(np.diag(pcov))
+    #r2 = r_squared(func_lineaire, densite_surf, coups, popt)
+    #plt.plot(x_axis,func_lineaire(x_axis, *popt), 'k-', label=f'Régression ({popt[0]:.1E} $\pm$ {std_popt[0]:.0E}) x + ({popt[1]:.0f} $\pm$ {std_popt[1]:.0f})')
+    #print(f'Régression linéaire ({popt[0]} +- {std_popt[0]}) x + ({popt[1]} +- {std_popt[1]})')
+    #print(f'R squared = {r2}')
+    plt.plot(x_axis,func_quadratique(x_axis, *popt), 'k-', label=f'Régression ({popt[0]:.2E} $\pm$ {std_popt[0]:.0E}) x$^2$')
+    print(f'Régression quadratique ({popt[0]} +- {std_popt[0]}) x^2')
+    
+
+    plt.legend(loc='best')
     #plt.xlabel('Densité électronique [é/cm$^3$]')
     plt.xlabel('Taille du diffuseur [é/cm$^2$]')
     plt.ylabel('Nombre de coups net / sec')
+    plt.savefig('graph/Graph_coups_fct_taille.pdf')
     plt.show()
 
 
@@ -306,6 +363,8 @@ def graph_section_eff_fct_angle(section_eff_exp:dict, section_eff_th:dict):
     for key in section_eff_exp.keys():
         if '_0' in key:
             continue
+        if 'al' not in key or len(key.split('_'))>2:
+            continue
         angles_exp.append(float(key.split('_')[-1]))
         section_eff_exp_plot.append(section_eff_exp[key][0])
         err_section_eff_exp_plot.append(section_eff_exp[key][1])
@@ -316,12 +375,13 @@ def graph_section_eff_fct_angle(section_eff_exp:dict, section_eff_th:dict):
         angles_th.append(float(key))
         section_eff_th_plot.append(section_eff_th[key])
     
-    plt.plot(angles_th, section_eff_th_plot, 'kx', label="Théorique")
     plt.plot(angles_exp, section_eff_exp_plot, 'k.', label="Expérimental")
     plt.errorbar(angles_exp, section_eff_exp_plot, yerr=err_section_eff_exp_plot, xerr=[1 for i in range(len(angles_exp))], capsize=5, c='k', fmt='.')
+    plt.plot(angles_th, section_eff_th_plot, 'rx', label="Théorique")
     plt.xlabel('Angle de diffusion [°]')
     plt.ylabel('Section efficace différentielle [cm$^2$]')
     plt.legend(loc='best')
+    plt.savefig('graph/Graph_section_eff_fct_angle_single.pdf')
     plt.show()
     
 graph_section_eff_fct_angle(section_eff_exp=section_eff_diff, section_eff_th=section_eff_th)
@@ -346,21 +406,19 @@ err_T_elec_exp = np.array([5.652612262337268, 5.918388327917103, 5.9572444601002
 
 def graph_energie_diffuse_fct_angle(E_diff_exp, err_E_diff, E_diff_th):
     angles = [45, 60, 75, 90, 110] # mettre 0 ou non??
-    plt.plot(angles, E_diff_th, 'kx', label="Théorique")
     plt.plot(angles, E_diff_exp, 'k.', label='Expérimental')
     plt.errorbar(angles, E_diff_exp, yerr=err_E_diff, xerr=[1 for i in range(len(angles))], capsize=5, c='k', fmt='.')
+    plt.plot(angles, E_diff_th, 'rx', label="Théorique")
     plt.xlabel('Angle de diffusion [°]')
     plt.ylabel('Énergie du gamma diffusé [keV]')
     plt.legend(loc='best')
+    plt.savefig('graph/Graph_E_diff_fct_angle.pdf')
     plt.show()
 
 graph_energie_diffuse_fct_angle(E_diff_exp=E_gamma_diff, err_E_diff=err_E_gamma_diff, E_diff_th=E_gamma_diff_th)
 
 
 ### graph linéarité de la relation entre le rapport ho / hv’ et (1 - cos theta)
-
-def func_lineaire(x, a, b):
-    return a*x + b
 
 def erreur_rapport_energies(E_num, err_E_num, E_denum, err_E_denum):
     return erreur_mult_div(res=E_num/E_denum, x=E_num, delta_x=err_E_num, y=E_denum, delta_y=err_E_denum)
@@ -385,12 +443,15 @@ def graph_linearite_ratioEgamma_costheta(E_inc, err_E_inc, E_diff, err_E_diff):
     x_axis = np.linspace(0, 2)
     popt, pcov = opt.curve_fit(func_lineaire, x, rapport)
     std_popt = np.sqrt(np.diag(pcov))
-    plt.plot(x_axis,func_lineaire(x_axis, *popt), 'k-', label=f'Régression ({popt[0]:.3f} +- {std_popt[0]:.3f}) x + ({popt[1]:.3f} +- {std_popt[1]:.3f})')
+    r2 = r_squared(func_lineaire, x, rapport, popt)
+    plt.plot(x_axis,func_lineaire(x_axis, *popt), 'k-', label=f'Régression ({popt[0]:.3f} $\pm$ {std_popt[0]:.3f}) x + ({popt[1]:.3f} $\pm$ {std_popt[1]:.3f})')
     print(f'Régression linéaire ({popt[0]} +- {std_popt[0]}) x + ({popt[1]} +- {std_popt[1]})')
+    print(f'R squared = {r2}')
 
     plt.xlabel('$1 - \cos(θ)$ [-]')
     plt.ylabel("$hν_0 / hν'$ [-]")
     plt.legend(loc='best')
+    plt.savefig('graph/Graph_linearite_Egamma.pdf')
     plt.show()
 
 graph_linearite_ratioEgamma_costheta(E_inc=E_gamma_inc, err_E_inc=err_E_gamma_inc, E_diff=E_gamma_diff, err_E_diff=err_E_gamma_diff)
@@ -417,11 +478,12 @@ for idx, ang in enumerate([45, 60, 75, 90, 110]):
 def graph_energie_electron_fct_angle(T_exp, err_T, T_th):
     angles = [45, 60, 75, 90, 110]
     plt.plot(angles, T_exp, 'k.', label='Expérimental')
-    plt.plot(angles, T_th, 'kx', label='Théorique')
     plt.errorbar(angles, T_exp, yerr=err_T, xerr=[1 for i in range(len(angles))], capsize=5, c='k', fmt='.')
+    plt.plot(angles, T_th, 'rx', label='Théorique')
     plt.xlabel('Angle de diffusion [°]')
     plt.ylabel("Énergie cinétique de l'électron de recul [keV]")
     plt.legend(loc='best')
+    plt.savefig('graph/Graph_Telec_fct_angle.pdf')
     plt.show()
 
 graph_energie_electron_fct_angle(T_elec_exp, err_T_elec_exp, T_elec_th)
@@ -446,12 +508,16 @@ def graph_linearite_ratioEelectron_invcostheta(E_inc, err_E_inc, T, err_T):
     x_axis = np.linspace(0, 4)
     popt, pcov = opt.curve_fit(func_lineaire, x, rapport)
     std_popt = np.sqrt(np.diag(pcov))
-    plt.plot(x_axis,func_lineaire(x_axis, *popt), 'k-', label=f'Régression ({popt[0]:.3f} +- {std_popt[0]:.3f}) x + ({popt[1]:.2f} +- {std_popt[1]:.2f})')
+    plt.plot(x_axis,func_lineaire(x_axis, *popt), 'k-', label=f'Régression ({popt[0]:.3f} $\pm$ {std_popt[0]:.3f}) x + ({popt[1]:.2f} $\pm$ {std_popt[1]:.2f})')
     print(f'Régression linéaire ({popt[0]} +- {std_popt[0]}) x + ({popt[1]} +- {std_popt[1]})')
+    
+    r2 = r_squared(func_lineaire, x, rapport, popt)
+    print(f'R squared = {r2}')
 
-    plt.xlabel('$1 - \cos(θ)$ [-]')
+    plt.xlabel('$(1 - \cosθ)^{–1}$ [-]')
     plt.ylabel("$hν_0 / T$ [-]")
     plt.legend(loc='best')
+    plt.savefig('graph/Graph_linearite_Eelec.pdf')
     plt.show()
 
 graph_linearite_ratioEelectron_invcostheta(E_gamma_diff, err_E_gamma_diff, T_elec_exp, err_T_elec_exp)
