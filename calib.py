@@ -49,7 +49,7 @@ y_pred = calibrer_axe_x(indices_connu)
 r_squared = r2_score(valeurs_calibrees, y_pred)
 
 plt.plot(indices_connu, y_pred, label='Étalonnage en énergie estimée par une équation linéaire')
-plt.errorbar(indices_connu, valeurs_calibrees, xerr=ind_err, fmt='o', markersize=2, label='Résultats expérimentaux de centroïde des photopics observés')
+plt.errorbar(indices_connu, valeurs_calibrees, xerr=ind_err, fmt='o', markersize=2, capsize=2, label='Résultats expérimentaux de centroïde des photopics observés')
 
 # Print equation on the plot
 equation_text = f'E = ({a:.5f} ± {a_err:.5f})n + ({b:.5f} ± {b_err:.5f})\n$R^2$ = {r_squared:.5f}'
