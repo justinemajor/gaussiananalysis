@@ -9,9 +9,9 @@ from sklearn.metrics import r2_score
 valeurs_calibrees = np.array([31, 81, 356, 122, 662, 511])
 
 # calibration pour Donnees1
-# data_type = ".txt"
-# indices_connu = np.array([89.18195171624912, 225.22477063739933, 907.3673017230627, 332.80225678111793, 1630.5176612913885, 1276.4063097242545])
-# ind_err = np.array([0.10330014789679091, 0.2101421232625593, 0.3007822206488959, 0.3367551617471958, 0.7100886258906968, 0.5603109892438263])
+data_type = ".txt"
+indices_connu = np.array([89.18195171624912, 225.22477063739933, 907.3673017230627, 332.80225678111793, 1630.5176612913885, 1276.4063097242545])
+ind_err = np.array([0.10330014789679091, 0.2101421232625593, 0.3007822206488959, 0.3367551617471958, 0.7100886258906968, 0.5603109892438263])
 
 # calibration pour Donnees2 - fixe
 # data_type = "fixe"
@@ -19,9 +19,9 @@ valeurs_calibrees = np.array([31, 81, 356, 122, 662, 511])
 # ind_err = np.array([0.22822323644130665, 0.2907925811609367, 0.9510550341014323, 0.7781199749201924, 2.7913368855598684, 1.0660246062057506])
 
 # calibration pour Donnees2 - mobile
-data_type = "mobile"
-indices_connu = np.array([182.53096167711857, 481.73852791480573, 1903.007495986019, 708.9043529372805, 3367.1005554765425, 2659.326003318573])
-ind_err = np.array([0.11109054210948104, 0.25104722835076726, 0.5641348102204444, 0.44680194564618514, 1.3528018433454418, 0.8126560157728914])
+# data_type = "mobile"
+# indices_connu = np.array([182.53096167711857, 481.73852791480573, 1903.007495986019, 708.9043529372805, 3367.1005554765425, 2659.326003318573])
+# ind_err = np.array([0.11109054210948104, 0.25104722835076726, 0.5641348102204444, 0.44680194564618514, 1.3528018433454418, 0.8126560157728914])
 
 
 # indices_connu = np.sort(indices_connu)
@@ -49,10 +49,10 @@ y_pred = calibrer_axe_x(indices_connu)
 r_squared = r2_score(valeurs_calibrees, y_pred)
 
 plt.plot(indices_connu, y_pred, label='Étalonnage en énergie estimée par une équation linéaire')
-plt.errorbar(indices_connu, valeurs_calibrees, xerr=ind_err, fmt='o', markersize=2, capsize=2, label='Résultats expérimentaux de centroïde des photopics observés')
+plt.errorbar(indices_connu, valeurs_calibrees, xerr=ind_err, fmt='o', capsize=3, label='Résultats expérimentaux de centroïde des photopics observés')
 
 # Print equation on the plot
-equation_text = f'E = ({a:.5f} ± {a_err:.5f})n + ({b:.5f} ± {b_err:.5f})\n$R^2$ = {r_squared:.5f}'
+equation_text = f'E = ({a:.4f} ± {a_err:.4f})n + ({b:.1f} ± {b_err:.1f})\n$R^2$ = {r_squared:.5f}'
 plt.text(0.5, 0.7, equation_text, horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes, fontsize=12)
 
 plt.xlabel('Canaux d\'énergie connus')
